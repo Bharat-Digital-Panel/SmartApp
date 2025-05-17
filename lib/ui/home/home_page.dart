@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -19,6 +21,45 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static const platform = MethodChannel('com.example.sms/send');
+  // final TextEditingController _phoneController = TextEditingController();
+
+  Future<void> _sendSms(String message) async {
+    // final phone = _phoneController.text.trim();
+    final phone = "+919865289027"; // replace with your number
+
+    // if (phone.isEmpty) {
+    //   ScaffoldMessenger.of(
+    //     context,
+    //   ).showSnackBar(SnackBar(content: Text('Please enter a mobile number')));
+    //   return;
+    // }
+
+    await Permission.sms.request();
+
+    try {
+      await platform.invokeMethod('sendSms', {
+        "phone": phone,
+        "message": message,
+      });
+      // await _savePhoneNumber(phone);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('SMS sent to $phone')));
+    } on PlatformException catch (e) {
+      print("Error: ${e.message}");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to send SMS')));
+    }
+  }
+
+  // @override
+  // void dispose() {
+  //   _phoneController.dispose();
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -43,14 +84,21 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // TextField(
+            //   controller: _phoneController,
+            //   decoration: InputDecoration(
+            //     labelText: 'Enter Mobile Number',
+            //     border: OutlineInputBorder(),
+            //     prefixText: '+91 ',
+            //   ),
+            //   keyboardType: TextInputType.phone,
+            // ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF4CAF50),
                 foregroundColor: Colors.white,
               ),
-              onPressed: () {
-                print('ON button pressed');
-              },
+              onPressed: () => _sendSms("ON"),
               child: const Text('ON'),
             ),
             SizedBox(width: MediaQuery.of(context).size.width * 0.15),
@@ -59,9 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 backgroundColor: Color(0xFFF44336),
                 foregroundColor: Colors.white,
               ),
-              onPressed: () {
-                print('OFF button pressed');
-              },
+              onPressed: () => _sendSms("OFF"),
               child: const Text('OFF'),
             ),
           ],
