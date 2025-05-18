@@ -22,18 +22,30 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel('com.example.sms/send');
-  // final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  // Future<void> _loadSavedPhoneNumber() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? savedPhone = prefs.getString('mobile_number');
+  //   if (savedPhone != null) {
+  //     _phoneController.text = savedPhone;
+  //   }
+  // }
+
+  // Future<void> _savePhoneNumber(String phone) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('mobile_number', phone);
+  // }
 
   Future<void> _sendSms(String message) async {
-    // final phone = _phoneController.text.trim();
-    final phone = "+919865289027"; // replace with your number
+    final phone = _phoneController.text.trim();
 
-    // if (phone.isEmpty) {
-    //   ScaffoldMessenger.of(
-    //     context,
-    //   ).showSnackBar(SnackBar(content: Text('Please enter a mobile number')));
-    //   return;
-    // }
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Please enter a mobile number')));
+      return;
+    }
 
     await Permission.sms.request();
 
@@ -54,11 +66,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _phoneController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,37 +90,64 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Row(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // TextField(
-            //   controller: _phoneController,
-            //   decoration: InputDecoration(
-            //     labelText: 'Enter Mobile Number',
-            //     border: OutlineInputBorder(),
-            //     prefixText: '+91 ',
-            //   ),
-            //   keyboardType: TextInputType.phone,
-            // ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF4CAF50),
-                foregroundColor: Colors.white,
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(
+                labelText: 'Enter starter mobile number',
+                border: OutlineInputBorder(),
+                prefixText: '+91 ',
               ),
-              onPressed: () => _sendSms("ON"),
-              child: const Text('ON'),
+              keyboardType: TextInputType.phone,
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.15),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFF44336),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () => _sendSms("OFF"),
-              child: const Text('OFF'),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF4CAF50),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => _sendSms("ON"),
+                  child: const Text('ON'),
+                ),
+                SizedBox(width: MediaQuery.of(context).size.width * 0.15),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFF44336),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => _sendSms("OFF"),
+                  child: const Text('OFF'),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromRGBO(0,191,255, 1),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => _sendSms("STS"),
+                  child: const Text('Status'),
+                ),
+                SizedBox(width: MediaQuery.of(context).size.width * 0.15),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromRGBO(0,0,128,1),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => _sendSms("SET 10"),
+                  child: const Text('Current Set'),
+                ),
+              ],
             ),
           ],
         ),
